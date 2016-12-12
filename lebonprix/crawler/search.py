@@ -17,13 +17,14 @@ class LBC:
 
 class Item(LBC):
     PAGE = 'view.json'
-    def __init__(self, item_id):
+    def __init__(self, item_id, session):
         self.id = item_id
+        self.session = session
 
     def __call__(self):
         new_data = self.DATA.copy()
         new_data['ad_id'] = self.id
-        r = requests.post(
+        r = self.session.post(
             url = self.BASE_URI + self.PAGE,
             params = {'ad_id': self.id},
             data = new_data,
@@ -37,6 +38,7 @@ class Search(LBC):
 
     def __init__(self, default_params, additional_params=None):
         self.list = None
+        self.session = requests.Session()
         self.params = default_params.copy()
         for param in additional_params:
             self.params.update(param.as_param())
@@ -58,13 +60,13 @@ class Search(LBC):
             if last_page == -1:
                 last_page = int(l['lastpagenumber'].replace(' ', ''))
             for x in l['ads']:
-                yield Item(x['list_id'])
+                yield Item(x['list_id'], self.session)
             # update pivot to get next page
             pivot = self.pivot_from_item(l['ads'][-1])
             current_page += 1
 
     def get_list(self, pivot):
-        r = requests.post(
+        r = self.session.post(
             url = self.BASE_URI + Search.PAGE + '?pivot={}'.format(pivot),
             data = self.DATA,
             params = self.params,
