@@ -23,7 +23,7 @@ class CarParamText:
         self.val = val
 
     def as_param(self):
-        return {'it': 1, 'q': self.val}
+        return {'it': 1, 'q': self.val} if self.val is not None else {}
 
 
 class CarParamModel:
@@ -57,13 +57,19 @@ class CarSearch(Search):
         'f': 'a',
     }
 
-    def __init__(self, brand, model, fuel):
+    def __init__(self, brand, model, fuel, detail=None):
         params = [
             CarParamModel(brand, model),
             CarParamFuel(fuel),
             CarParamCategory(),
+            CarParamText(detail),
         ]
         super().__init__(self.DEFAULT_PARAMS, params)
+
+    def prepare_guess(self, item):
+        def transform_gearbox(val):
+            return 1 if val == 'Manuelle' else 0
+        return [transform_gearbox(item['gearbox']), item['mileage'], item['regdate'], item['company_ad']]
 
     def prepare_item(self, item):
         def transform_gearbox(val):
@@ -93,13 +99,15 @@ class CarSearch(Search):
 
     def __call__(self):
         for item in super().__call__():
-            yield self.prepare_item(item())
+            try:
+                res = self.prepare_item(item())
+            except:
+                pass
+            else:
+                yield res
     
-    def predict(self, prepared_inputs, guess):
+    def predict(self, inputs, guess):
         lr = LinearRegression()
-        guess_prep = np.array([[float(guess['gearbox']),
-                                float(guess['mileage']),
-                                float(guess['regdate']),
-                                float(guess['company_ad'])]])
-        x, y = lr.prepare_input(prepared_inputs, ['gearbox', 'mileage', 'regdate', 'company_ad'], 'price')
+        guess_prep = np.array([self.prepare_guess(guess)])
+        x, y = lr.prepare_input(inputs, ['gearbox', 'mileage', 'regdate', 'company_ad'], 'price')
         return lr.lr(x, y, guess_prep)
