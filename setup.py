@@ -10,5 +10,9 @@ setup(
         'numpy',
         'scipy',
         'scikit-learn'  
+    ],
+    packages = [
+        'lebonprix',
+        'lebonprix.crawler'
     ]
 )
