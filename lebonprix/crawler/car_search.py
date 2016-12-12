@@ -57,7 +57,15 @@ class CarSearch(Search):
         'f': 'a',
     }
 
-    def prepare_input(self, search_results):
+    def __init__(self, brand, model, fuel):
+        params = [
+            CarParamModel(brand, model),
+            CarParamFuel(fuel),
+            CarParamCategory(),
+        ]
+        super().__init__(self.DEFAULT_PARAMS, params)
+
+    def prepare_item(self, item):
         def transform_gearbox(val):
             return 1 if val == 'Manuelle' else 0
         def transform_mileage(val):
@@ -69,35 +77,23 @@ class CarSearch(Search):
         def transform_company_ad(val):
             return int(val)
 
-        res = []
-        for search_result in search_results:
-            row = {}
-            row['price'] = transform_price(search_result['price'])
-            row['company_ad'] = transform_company_ad(search_result['company_ad'])
-            row['gearbox'] = [ transform_gearbox(param['value'])
-                               for param in search_result['parameters']
-                               if param['id'] == 'gearbox' ][0]
-            row['mileage'] = [ transform_mileage(param['value'])
-                               for param in search_result['parameters']
-                               if param['id'] == 'mileage' ][0]
-            row['regdate'] = [ transform_regdate(param['value'])
-                               for param in search_result['parameters']
-                               if param['id'] == 'regdate' ][0]
-            res.append(row)
-        return res
-            
-    def search(self, brand, model, fuel):
-        params = [
-            CarParamModel(brand, model),
-            CarParamFuel(fuel),
-            CarParamCategory(),
-        ]
-        lst = super().search(self.DEFAULT_PARAMS, params)
-        #lst = super().search(self.URI, None)
-        res = []
-        for x in lst['ads']:
-            res.append(super().item(x['list_id']))
-        return res
+        return {
+            'price': transform_price(item['price']),
+            'company_ad': transform_company_ad(item['company_ad']),
+            'gearbox': [ transform_gearbox(param['value'])
+                         for param in item['parameters']
+                         if param['id'] == 'gearbox' ][0],
+            'mileage': [ transform_mileage(param['value'])
+                         for param in item['parameters']
+                         if param['id'] == 'mileage' ][0],
+            'regdate': [ transform_regdate(param['value'])
+                         for param in item['parameters']
+                         if param['id'] == 'regdate' ][0]
+        }
+
+    def __call__(self):
+        for item in super().__call__():
+            yield self.prepare_item(item())
     
     def predict(self, prepared_inputs, guess):
         lr = LinearRegression()
