@@ -76,20 +76,20 @@ class CarSearch(Search):
 
     def prepare_guess(self, item):
         def transform_gearbox(val):
-            return 1 if val == 'Manuelle' else 0
-        return [transform_gearbox(item['gearbox']), item['mileage'], item['regdate'], item['company_ad']]
+            return 1.0 if val == 'Manuelle' else 0.0
+        return [transform_gearbox(item['gearbox']), float(item['mileage']), float(item['regdate']), float(item['company_ad'])]
 
     def prepare_item(self, item):
         def transform_gearbox(val):
-            return 1 if val == 'Manuelle' else 0
+            return 1.0 if val == 'Manuelle' else 0.0
         def transform_mileage(val):
-            return int(val.rstrip(' KM').replace(' ', ''))
+            return float(val.rstrip(' KM').replace(' ', ''))
         def transform_price(val):
-            return int(val.replace(' ', ''))
+            return float(val.replace(' ', ''))
         def transform_regdate(val):
-            return int(val)
+            return float(val)
         def transform_company_ad(val):
-            return int(val)
+            return float(val)
 
         return {
             'price': transform_price(item['price']),
