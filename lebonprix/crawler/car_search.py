@@ -28,13 +28,21 @@ class CarParamText:
 
 class CarParamModel:
     MODELS = {
+        'Audi': ['100', '200', '80', '90', 'A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A6/s6', 'A7', 'A8',
+                 'Allroad', 'Coupe', 'Q3', 'Q5', 'Q7', 'R8', 'Rs3 Sportback', 'Rs4', 'Rs5',
+                 'S4', 'S4 Avant', 'S4 Cabriolet', 'S5', 'S8', 'Tt', 'Tts', 'V8'],
+        'Bmw': ['I3', 'I8', 'M3', 'M4', 'M5', 'M6',
+                'Serie 1', 'Serie 2', 'Serie 3', 'Serie 4', 'Serie 5', 'Serie 6', 'Serie 7', 'Serie 8',
+                'X1', 'X3', 'X4', 'X5', 'X6', 'Z1', 'Z-series'],
         'Toyota': ['Gt86'],
-        'Peugeot': ['207'],
+        'Peugeot': ['207', '208'],
+        'Renault': ['Twingo'],
+        'Dacia': ['Sandero'],
     }
     def __init__(self, brand, model):
         self.brand = brand
         self.model = model
-    
+
     def as_param(self):
         if self.brand in self.MODELS and self.model in self.MODELS[self.brand]:
             return {'brd': self.brand, 'mdl': self.model}
