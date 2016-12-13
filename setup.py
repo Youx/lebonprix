@@ -33,6 +33,7 @@ setup(
         'numpy',
         'scipy',
         'scikit-learn',
+        'pymongo',
     ],
     test_requires = [
         'pytest',

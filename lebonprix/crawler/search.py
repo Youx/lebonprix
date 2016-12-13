@@ -1,6 +1,7 @@
 import requests
 import json
 from datetime import datetime
+from lebonprix.cache import Cache
 
 
 class LBC:
@@ -20,8 +21,13 @@ class Item(LBC):
     def __init__(self, item_id, session):
         self.id = item_id
         self.session = session
+        self.cache = Cache()
 
     def __call__(self):
+        cached_item = self.cache.get(self.id)
+        if cached_item is not None:
+            return cached_item
+
         new_data = self.DATA.copy()
         new_data['ad_id'] = self.id
         r = self.session.post(
@@ -30,7 +36,9 @@ class Item(LBC):
             data = new_data,
             headers = self.HEADERS
         )
-        return json.loads(r.text)
+        item = json.loads(r.text)
+        self.cache.set(item)
+        return item
 
 
 class Search(LBC):
@@ -42,7 +50,7 @@ class Search(LBC):
         self.params = default_params.copy()
         for param in additional_params:
             self.params.update(param.as_param())
-    
+
     @staticmethod
     def pivot_from_item(item):
         return '{},{},{}'.format(
