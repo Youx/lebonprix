@@ -1,5 +1,7 @@
 from lebonprix.crawler.search import Search
 import numpy as np
+import logging
+import json
 from lebonprix.lr import LinearRegression
 
 
@@ -109,11 +111,15 @@ class CarSearch(Search):
         for item in super().__call__():
             try:
                 res = self.prepare_item(item())
-            except:
+            except KeyError:
+                pass
+            except json.decoder.JSONDecodeError:
+                pass
+            except ValueError:
                 pass
             else:
                 yield res
-    
+
     def predict(self, inputs, guess):
         lr = LinearRegression()
         guess_prep = np.array([self.prepare_guess(guess)])
