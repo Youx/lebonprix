@@ -34,6 +34,7 @@ setup(
         'scipy',
         'scikit-learn',
         'pymongo',
+        'flask',
     ],
     test_requires = [
         'pytest',
@@ -41,7 +42,8 @@ setup(
     ],
     packages = [
         'lebonprix',
-        'lebonprix.crawler'
+        'lebonprix.crawler',
+        'lebonprix.middleware',
     ],
     cmdclass = {'test': PyTest}
 )
