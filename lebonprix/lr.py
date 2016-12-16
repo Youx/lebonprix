@@ -13,10 +13,10 @@ class LinearRegression:
             y.append(float(elem[result]))
             x.append(row)
         return (np.array(x), np.array(y))
-        
+
     def lr(self, x, y, guess):
         """ Predict the value for some data
-        
+
         Args:
             data (list(dict)) : an array of input data"""
         scaler = preprocessing.StandardScaler().fit(x)

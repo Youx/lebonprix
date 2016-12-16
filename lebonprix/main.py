@@ -29,6 +29,10 @@ def main():
                       gearbox='Manuelle', regdate='2015', company_ad=0, mileage=50000)
 
 
+def main():
+    s = CarSearch('Toyota', 'Gt86', fuel='Essence')
+    data = list(s())
+    s.find_best(data, 20, {'gearbox': 'Manuelle', 'max_price': 23000, 'max_mileage': 50000})
     #res_gt86 = CarSearch('Toyota', 'Gt86', 'Essence')
     #count = 0
     #for x in res_gt86():
