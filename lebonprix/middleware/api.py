@@ -10,7 +10,7 @@ def list_brands_and_models():
 
 @app.route("/api/cars/params/fuel")
 def list_fuels():
-    return flask.json.jsonify(list(CarParamFuel.VALUES))
+    return flask.json.jsonify(sorted(CarParamFuel.VALUES, key=CarParamFuel.VALUES.get))
 
 @app.route("/api/cars/params/gearbox")
 def list_gearbox():
@@ -20,12 +20,12 @@ def list_gearbox():
 @app.route("/api/cars/predict", methods=['POST'])
 def predict_price():
     data = flask.request.get_json()
-    search = CarSearch(data['brand'], data['model'], data['fuel'], data['spec'],
-                       data['gearbox'], data['regdate'], data['mileage'])
+    print(data)
+    search = CarSearch(data['brand'], data['model'], data['fuel'], data['spec'])
     search_results = list(search())
     price = search.predict(search_results, {'gearbox': data['gearbox'], 'regdate': data['regdate'],
                                             'company_ad': data['company_ad'], 'mileage': data['mileage']})
-    return flask.json.jsonify({'price': price, 'sample_size': len(search_results)})
+    return flask.json.jsonify({'price': int(price[0]), 'sample_size': len(search_results)})
 
 
 if __name__ == '__main__':
