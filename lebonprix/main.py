@@ -8,7 +8,7 @@ def predict_car_price(brand, model, fuel, gearbox, regdate, company_ad, mileage,
     print("Expected price for {} {} {} {} {} from {} with {} km".format(
           brand, model, fuel, spec, gearbox, regdate, mileage
     ))
-    s = CarSearch(brand, model, fuel, spec)
+    s = CarSearch(brand=brand, model=model, fuel=fuel, detail=spec)
     data = list(s())
     print("Sample size : {} elements".format(len(data)))
     price = s.predict(data, {'gearbox': gearbox, 'regdate': regdate,
@@ -30,7 +30,7 @@ def main():
 
 
 def main():
-    s = CarSearch('Toyota', 'Gt86', fuel='Essence')
+    s = CarSearch(brand='Toyota', model='Gt86', fuel='Essence')
     data = list(s())
     s.find_best(data, 20, {'gearbox': 'Manuelle', 'max_price': 23000, 'max_mileage': 50000})
     #res_gt86 = CarSearch('Toyota', 'Gt86', 'Essence')
