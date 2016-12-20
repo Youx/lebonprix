@@ -179,14 +179,41 @@ Vue.component('car-best-price', {
 				data: JSON.stringify(data),
 				contentType: 'application/json'
 			}).done(function(val) {
-				component.prediction = val.price;
-				component.sample_size = val.sample_size;
-				component.search_pending = false;
+				bus.$emit('searching', false);
+				bus.$emit('prediction', {
+					price: val.price,
+					sample_size: val.sample_size
+				});
 			});
 		}
 	}
 });
 
-var app7 = new Vue({
+Vue.component('prediction-result', {
+	template:
+`<div>
+	searching : {{searching}} | price : {{prediction.price}} | sample size : {{prediction.sample_size}}
+</div>`,
+	data: function() {
+		return {
+			searching: false,
+			prediction: {
+				price: -1,
+				sample_size: -1
+			}
+		};
+	},
+	created: function() {
+		var component = this;
+		bus.$on('prediction', function(val) {
+			component.prediction.price = val.price;
+			component.prediction.sample_size = val.sample_size;
+		});
+		bus.$on('searching', function(val) {
+			component.searching = val;
+		});
+	}
+});
+var app = new Vue({
 	el: '#main'
 });
