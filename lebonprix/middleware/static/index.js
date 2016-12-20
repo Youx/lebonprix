@@ -1,9 +1,12 @@
-Vue.component('dropdown', {
+Vue.component('search-select', {
 	template:
-`<select @input="$emit('input', $event.target.value)" :value="value">
-	<option v-for="elem in elements">{{ elem }}</option>
-</select>`,
-	props: ['elements', 'value'],
+`<div class="form-group">
+	<label>{{title}}</label>
+	<select class="form-control" @input="$emit('input', $event.target.value)" :value="value">
+		<option v-for="elem in elements">{{ elem }}</option>
+	</select>
+</div>`,
+	props: ['elements', 'value', 'title'],
 	watch: {
 		elements: function(val, oldval) {
 			this.$emit('input', val[0]); /* when elements change, reset selection to element 0 */
@@ -11,70 +14,126 @@ Vue.component('dropdown', {
 	}
 });
 
+Vue.component('search-mileage', {
+	template:
+`<div class="form-group">
+	<label>{{title}}</label>
+	<div class="input-group">
+		<input @input="$emit('input', $event.target.value)" :value='value' class="form-control"></input>
+		<div class='input-group-addon'>km</div>
+	</div>
+</div>`,
+	props: ['title', 'value']
+});
+
+Vue.component('search-company-ad', {
+	template:
+`<div class='form-check'>
+	<label class='form-check-label'>
+		<input class='form-check-input' type="checkbox" :value='value' @input="$emit('input', $event.target.value)">
+		{{title}}
+	</label>
+</div>`,
+	props: ['title', 'value']
+});
+
+Vue.component('search-text', {
+	template:
+`<div class="form-group">
+	<label>{{title}}</label>
+	<input class="form-control" type='text' :value='value' @input="$emit('input', $event.target.value)" :placeholder='placeholder'></input>
+</div>
+`,
+	props: ['title', 'placeholder', 'value']
+});
+
+Vue.component('search-int', {
+	template:
+`<div class="form-group">
+	<label>{{title}}</label>
+	<input class="form-control" type='number' :value='value' @input="$emit('input', $event.target.value)"></input>
+</div>`,
+	props: ['title', 'value']
+});
+
+Vue.component('search-radio', {
+	template:
+`<div class="form-group">
+	<div><label>{{title}}</label></div>
+	<label class="form-check-label" v-for="elem in elements">
+		<input type='radio' class='form-check-input' @input="$emit('input', $event.target.value)" :value="elem" :checked='value==elem'> {{elem}}
+	</label>
+</div>`,
+	props: ['title', 'value', 'elements'],
+	watch: {
+		elements: function(val, oldval) {
+			this.$emit('input', val[0]); /* when elements change, reset selection to element 0 */
+		}
+	}
+});
+
+var bus = new Vue();
+
 Vue.component('car-best-price', {
 	template:
 `<div>
-	<p>Kilometrage : <input v-model='mileage' id="mileage"></input></p>
-	<p>Professional : <input type="checkbox" v-model="company_ad"></input></p>
-	<p>Année : <input v-model="regdate"></input></p>
-	<p>{{fuel.name}} : <dropdown v-model='fuel.selected' :name="fuel.name" :elements="fuel.elements"></dropdown></p>
-	<p>{{brand.name}} : <dropdown v-model='brand.selected' :name="brand.name" :elements="brand.elements"></dropdown></p>
-	<p>{{model.name}} : <dropdown v-model='model.selected' :name="model.name" :elements="model.elements[brand.selected]"></dropdown></p>
-	<p>{{gearbox.name}} : <dropdown v-model='gearbox.selected' :name='gearbox.name' :elements='gearbox.elements'></dropdown></p>
-	<p>Detail : <input type='text' v-model='spec' placeholder='Enter spec here'></input></p>
-	<button @click="predict">Predict</button>
-	<div>{{result_str}}</div>
+	<legend>Critères primaires</legend>
+	<search-select v-model='brand.value' :title='brand.title' :elements="brand.elements"></search-select>
+	<search-select v-model='model.value' :title='model.title' :elements="model.elements[brand.value]"></search-select>
+	<search-select v-model='fuel.value' :title='fuel.title' :elements="fuel.elements"></search-select>
+	<search-text v-model='spec.value' :title='spec.title' :placeholder='spec.placeholder'></search-text>
+
+	<legend>Critères prédictifs</legend>
+	<search-mileage v-model='mileage.value' :title='mileage.title'></search-mileage>
+	<search-company-ad v-model='company_ad.value' :title='company_ad.title'></search-company-ad>
+	<search-int v-model='regdate.value' :title='regdate.title'></search-int>
+	<search-radio v-model='gearbox.value' :title='gearbox.title' :elements='gearbox.elements'></search-radio>
+	<button class="btn btn-primary" @click="predict">Predict</button>
 </div>
 `,
 	data: function() {
 		return {
-			spec: '',
-			mileage: 0,
-			company_ad: false,
-			regdate: 2016,
+			spec: {
+				title: 'Détail',
+				placeholder: 'Modèle/motorisation (ex: 1.6 vti, 320d, 1.6 120, ...)',
+				value: ''
+			},
+			mileage: {
+				title: 'Kilometrage',
+				value: 0
+			},
+			company_ad: {
+				title: 'Professionel',
+				value: false
+			},
+			regdate: {
+				title: 'Année',
+				value: 2016
+			},
 			fuel: {
-				name: "Carburant",
+				title: "Carburant",
 				elements: [''],
-				selected: ''
+				value: ''
 			},
 			brand: {
-				name: "Marque",
+				title: "Marque",
 				elements: [],
-				selected: ''
+				value: ''
 			},
 			model: {
-				name: "Modele",
+				title: "Modele",
 				elements: {},
-				selected: ''
+				value: ''
 			},
 			gearbox: {
 				name: 'Boite de vitesse',
 				elements: [],
-				selected: ''
+				value: ''
 			},
-			brand_model: {},
 			prediction: -1,
 			sample_size: -1,
 			search_pending: false,
 		};
-	},
-	computed: {
-		result_str: function() {
-			this.search_pending;
-			this.prediction;
-			this.sample_size;
-			if (this.search_pending) {
-				return 'Please wait...';
-			} else if (this.prediction == -1) {
-				return '';
-			} else if (this.sample_size < 30) {
-				return 'Pas assez de résultats. Prix estimé à ' + this.prediction + '€';
-			} else if (this.sample_size > 200) {
-				return 'Recherche trop imprécise. Prix estimé à ' + this.prediction + '€';
-			} else {
-				return 'Prix estimé à ' + this.prediction + '€';
-			}
-		}
 	},
 	created: function() {
 		this.fuel_fetch();
@@ -83,40 +142,36 @@ Vue.component('car-best-price', {
 	},
 	methods: {
 		fuel_fetch: function() {
-			component = this;
+			var component = this;
 			$.getJSON('/api/cars/params/fuel').done(function(val) {
 				component.fuel.elements = val;
-				component.fuel.selected = val[0];
 			});
 		},
 		brand_model_fetch: function() {
-			component = this;
+			var component = this;
 			$.getJSON('/api/cars/params/brand_model').done(function(val) {
 				component.brand.elements = Object.keys(val);
-				component.brand.selected = component.brand.elements[0];
 				component.model.elements = val;
-				component.model.selected = component.model.elements[component.brand.selected][0];
 			});
 		},
 		gearbox_fetch: function() {
-			component = this;
+			var component = this;
 			$.getJSON('/api/cars/params/gearbox').done(function(val) {
 				component.gearbox.elements = val;
-				component.gearbox.selected = val[0];
 			});
 		},
 		predict: function() {
-			component = this;
-			this.search_pending = true;
+			var component = this;
+			bus.$emit('searching', true);
 			var data = {
-				brand: this.brand.selected,
-				model: this.model.selected,
-				fuel: this.fuel.selected,
-				gearbox: this.gearbox.selected,
-				regdate: this.regdate,
-				mileage: this.mileage,
-				spec: this.spec,
-				company_ad: this.company_ad
+				brand: this.brand.value,
+				model: this.model.value,
+				fuel: this.fuel.value,
+				gearbox: this.gearbox.value,
+				regdate: this.regdate.value,
+				mileage: this.mileage.value,
+				spec: this.spec.value,
+				company_ad: this.company_ad.value
 			};
 			$.ajax({
 				type: 'POST',
