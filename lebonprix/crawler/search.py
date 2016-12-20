@@ -53,10 +53,14 @@ class Search(LBC):
 
     @staticmethod
     def pivot_from_item(item):
+        try:
+            price = int(item['price'].replace(' ', ''))
+        except:
+            price=0
         return '{},{},{}'.format(
             item['list_id'],
             int(datetime.strptime(item['list_time'], '%Y-%m-%d %H:%M:%S').timestamp()),
-            int(item['price'].replace(' ', ''))
+            price
         )
 
     def __call__(self):
