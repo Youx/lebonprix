@@ -21,7 +21,7 @@ def list_gearbox():
 def predict_price():
     data = flask.request.get_json()
     print(data)
-    search = CarSearch(data['brand'], data['model'], data['fuel'], data['spec'])
+    search = CarSearch(brand=data['brand'], model=data['model'], fuel=data['fuel'], detail=data['spec'])
     search_results = list(search())
     price = search.predict(search_results, {'gearbox': data['gearbox'], 'regdate': data['regdate'],
                                             'company_ad': data['company_ad'], 'mileage': data['mileage']})

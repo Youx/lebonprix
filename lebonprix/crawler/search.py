@@ -23,6 +23,11 @@ class Item(LBC):
         self.session = session
         self.cache = Cache()
 
+    def in_cache(self):
+        if self.cache.get(self.id) is not None:
+            return True
+        return False
+
     def __call__(self):
         cached_item = self.cache.get(self.id)
         if cached_item is not None:
@@ -44,8 +49,10 @@ class Item(LBC):
 class Search(LBC):
     PAGE = 'list.json'
 
-    def __init__(self, default_params, additional_params=None):
+    def __init__(self, search_limit, default_params, additional_params=None):
+        additional_params = [] if additional_params is None else additional_params
         self.list = None
+        self.search_limit = search_limit
         self.session = requests.Session()
         self.params = default_params.copy()
         for param in additional_params:
@@ -64,6 +71,7 @@ class Search(LBC):
         )
 
     def __call__(self):
+        fetch_count = 0
         current_page = 1
         last_page = -1
         pivot = '0,0,0'
@@ -72,7 +80,18 @@ class Search(LBC):
             if last_page == -1:
                 last_page = int(l['lastpagenumber'].replace(' ', ''))
             for x in l['ads']:
-                yield Item(x['list_id'], self.session)
+                item = Item(x['list_id'], self.session)
+                if item.in_cache():
+                    yield item
+                elif self.search_limit == -1:
+                    yield item
+                elif fetch_count < self.search_limit:
+                    fetch_count += 1
+                    yield item
+                else:
+                    break
+            if self.search_limit != -1 and fetch_count >= self.search_limit:
+                break
             # update pivot to get next page
             pivot = self.pivot_from_item(l['ads'][-1])
             current_page += 1

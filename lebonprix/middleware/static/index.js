@@ -124,9 +124,6 @@ Vue.component('car-best-price', {
 			this.model.elements = this.brand_model[val];
 			this.model.selected = this.model.elements[0];
 		},
-		model_changed: function() {
-			console.log("model changed");
-		},
 		predict: function() {
 			component = this;
 			this.search_pending = true;

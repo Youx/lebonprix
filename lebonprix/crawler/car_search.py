@@ -68,14 +68,16 @@ class CarSearch(Search):
         'f': 'a',
     }
 
-    def __init__(self, brand, model, fuel, detail=None):
+    def __init__(self, brand, model, fuel, detail=None, search_limit=200):
         params = [
             CarParamModel(brand, model),
             CarParamFuel(fuel),
             CarParamCategory(),
             CarParamText(detail),
         ]
-        super().__init__(self.DEFAULT_PARAMS, params)
+        super().__init__(search_limit=search_limit,
+                         default_params=self.DEFAULT_PARAMS,
+                         additional_params=params)
 
     def prepare_guess(self, item):
         def transform_gearbox(val):
