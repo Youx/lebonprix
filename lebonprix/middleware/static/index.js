@@ -61,15 +61,22 @@ Vue.component('search-radio', {
 `<div class="form-group">
 	<div><label>{{title}}</label></div>
 	<label class="form-check-label" v-for="elem in elements">
-		<input type='radio' class='form-check-input' @input="$emit('input', $event.target.value)" :value="elem" :checked='value==elem'> {{elem}}
+		<input type='radio' class='form-check-input' v-model='internal' :value="elem"> {{elem}}
 	</label>
 </div>`,
+	data: function() { return { internal: '' }; },
 	props: ['title', 'value', 'elements'],
 	watch: {
 		elements: function(val, oldval) {
 			this.$emit('input', val[0]); /* when elements change, reset selection to element 0 */
+		},
+		internal: function(val, oldval) {
+			this.$emit('input', val);
+		},
+		value: function(val, oldval) {
+			this.internal = val;
 		}
-	}
+	},
 });
 
 var bus = new Vue();
