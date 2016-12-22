@@ -95,7 +95,7 @@ Vue.component('car-best-price', {
 	<search-company-ad v-model='company_ad.value' :title='company_ad.title'></search-company-ad>
 	<search-int v-model='regdate.value' :title='regdate.title'></search-int>
 	<search-radio v-model='gearbox.value' :title='gearbox.title' :elements='gearbox.elements'></search-radio>
-	<button class="btn btn-primary" @click="predict">Predict</button>
+	<button class="btn btn-primary" @click="predict" :disabled='searching'>Predict</button>
 </div>
 `,
 	data: function() {
@@ -139,7 +139,7 @@ Vue.component('car-best-price', {
 			},
 			prediction: -1,
 			sample_size: -1,
-			search_pending: false,
+			searching: false,
 		};
 	},
 	created: function() {
@@ -169,6 +169,7 @@ Vue.component('car-best-price', {
 		},
 		predict: function() {
 			var component = this;
+			component.searching = true;
 			bus.$emit('searching', true);
 			var data = {
 				brand: this.brand.value,
@@ -186,6 +187,7 @@ Vue.component('car-best-price', {
 				data: JSON.stringify(data),
 				contentType: 'application/json'
 			}).done(function(val) {
+				component.searching = false;
 				bus.$emit('searching', false);
 				bus.$emit('prediction', {
 					price: val.price,
@@ -196,15 +198,40 @@ Vue.component('car-best-price', {
 	}
 });
 
-Vue.component('prediction-result', {
+Vue.component('loading', {
+	template:
+`<div v-if='display_on'>
+	<i class="fa fa-refresh fa-spin fa-3x fa-fw" aria-hidden="true"></i>
+	<span class="sr-only">Refreshing...</span>
+</div>`,
+	props: ['display_on']
+});
+
+Vue.component('prediction-price', {
+	template:
+`<div v-if='display_on'>
+	<div>price : {{price}}</div>
+	<div>sample size : {{sample_size}}</div>
+</div>
+`,
+	props: ['display_on', 'price', 'sample_size']
+});
+
+Vue.component('prediction-frame', {
 	template:
 `<div>
-	searching : {{searching}} | price : {{prediction.price}} | sample size : {{prediction.sample_size}}
-</div>`,
+	<loading :display_on='searching'></loading>
+	<prediction-price :display_on='prediction.available'
+					  :price='prediction.price'
+					  :sample_size='prediction.sample_size'>
+	</prediction-price>
+</div>
+`,
 	data: function() {
 		return {
 			searching: false,
 			prediction: {
+				available: false,
 				price: -1,
 				sample_size: -1
 			}
@@ -213,14 +240,18 @@ Vue.component('prediction-result', {
 	created: function() {
 		var component = this;
 		bus.$on('prediction', function(val) {
+			component.prediction.available = true;
 			component.prediction.price = val.price;
 			component.prediction.sample_size = val.sample_size;
 		});
 		bus.$on('searching', function(val) {
 			component.searching = val;
+			if (component.searching == true)
+				component.prediction.available = false;
 		});
 	}
 });
+
 var app = new Vue({
 	el: '#main'
 });
