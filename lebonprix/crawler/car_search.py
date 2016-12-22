@@ -99,10 +99,10 @@ class CarSearch(Search):
             return float(val)
         def transform_subject(val):
             return html.unescape(val)
-
         return {
             'id': item['list_id'],
             'subject': transform_subject(item['subject']),
+            'thumb': item['thumb'],
             'price': transform_price(item['price']),
             'company_ad': transform_company_ad(item['company_ad']),
             'gearbox': [ self._transform_gearbox(param['value'])

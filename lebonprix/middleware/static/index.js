@@ -191,7 +191,8 @@ Vue.component('car-best-price', {
 				bus.$emit('searching', false);
 				bus.$emit('prediction', {
 					price: val.price,
-					sample_size: val.sample_size
+					sample_size: val.sample_size,
+					samples: val.samples
 				});
 			});
 		}
@@ -212,25 +213,38 @@ Vue.component('prediction-price', {
 `<div v-if='display_on'>
 	<div>price : {{price}}</div>
 	<div>sample size : {{sample_size}}</div>
-</div>
-`,
+</div>`,
 	props: ['display_on', 'price', 'sample_size']
 });
 
+Vue.component('prediction-samples', {
+	template:
+`<div v-if='display_on'>
+	<div v-for='element in elements'>
+		<img :src='element.picture'></img>
+		<div>{{ element.title }}</div>
+	</div>
+</div>
+`,
+	props: ['elements', 'display_on']
+})
 Vue.component('prediction-frame', {
 	template:
 `<div>
 	<loading :display_on='searching'></loading>
+	<prediction-samples :display_on='prediction.available'
+						:elements='prediction.samples'>
+	</prediction-samples>
 	<prediction-price :display_on='prediction.available'
 					  :price='prediction.price'
 					  :sample_size='prediction.sample_size'>
 	</prediction-price>
-</div>
-`,
+</div>`,
 	data: function() {
 		return {
 			searching: false,
 			prediction: {
+				samples: [],
 				available: false,
 				price: -1,
 				sample_size: -1
@@ -243,6 +257,7 @@ Vue.component('prediction-frame', {
 			component.prediction.available = true;
 			component.prediction.price = val.price;
 			component.prediction.sample_size = val.sample_size;
+			component.prediction.samples = val.samples;
 		});
 		bus.$on('searching', function(val) {
 			component.searching = val;

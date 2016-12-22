@@ -18,9 +18,10 @@ class LBC:
 
 class Item(LBC):
     PAGE = 'view.json'
-    def __init__(self, item_id, session):
+    def __init__(self, item_id, session, additional_info=None):
         self.id = item_id
         self.session = session
+        self.additional_info = additional_info if additional_info else {}
         self.cache = Cache()
 
     def in_cache(self):
@@ -31,6 +32,14 @@ class Item(LBC):
     def __call__(self):
         cached_item = self.cache.get(self.id)
         if cached_item is not None:
+            # upgrade database if needed
+            need_to_update = False
+            for key in self.additional_info:
+                if key not in cached_item:
+                    need_to_update = True
+                    cached_item[key] = self.additional_info[key]
+            if need_to_update:
+                self.cache.set(cached_item)
             return cached_item
 
         new_data = self.DATA.copy()
@@ -42,6 +51,7 @@ class Item(LBC):
             headers = self.HEADERS
         )
         item = json.loads(r.text)
+        item.update(self.additional_info)
         self.cache.set(item)
         return item
 
@@ -80,7 +90,7 @@ class Search(LBC):
             if last_page == -1:
                 last_page = int(l['lastpagenumber'].replace(' ', ''))
             for x in l['ads']:
-                item = Item(x['list_id'], self.session)
+                item = Item(x['list_id'], self.session, {'thumb': x.get('thumb', '')})
                 if item.in_cache():
                     yield item
                 elif self.search_limit == -1:

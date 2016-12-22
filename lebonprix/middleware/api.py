@@ -20,12 +20,16 @@ def list_gearbox():
 @app.route("/api/cars/predict", methods=['POST'])
 def predict_price():
     data = flask.request.get_json()
-    print(data)
     search = CarSearch(brand=data['brand'], model=data['model'], fuel=data['fuel'], detail=data['spec'])
     search_results = list(search())
+    samples = [
+        {'title': result['subject'],
+         'picture': result['thumb']}
+        for result in search_results[:10]
+    ]
     price = search.predict(search_results, {'gearbox': data['gearbox'], 'regdate': data['regdate'],
                                             'company_ad': data['company_ad'], 'mileage': data['mileage']})
-    return flask.json.jsonify({'price': int(price[0]), 'sample_size': len(search_results)})
+    return flask.json.jsonify({'price': int(price[0]), 'sample_size': len(search_results), 'samples': samples})
 
 
 if __name__ == '__main__':
