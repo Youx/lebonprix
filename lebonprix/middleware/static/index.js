@@ -220,6 +220,7 @@ Vue.component('prediction-price', {
 Vue.component('prediction-samples', {
 	template:
 `<div v-if='display_on'>
+	<h2>Ce genre de voiture?</h2>
 	<div v-for='chunk in chunks' class='row' style='display: flex;'>
 		<div v-for='element in chunk' class='col-sm-3' style='display: flex;'>
 			<div class='thumbnail' style='width: 100%'>
