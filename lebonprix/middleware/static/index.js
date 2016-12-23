@@ -1,3 +1,15 @@
+Vue.component('help-tooltip', {
+	template:
+`<span :id='id' class='glyphicon glyphicon-question-sign'
+	   data-toggle="tooltip" data-placement="right" trigger='hover'
+	   :title="text">
+</span>`,
+	props: ['id', 'text'],
+	mounted: function() {
+		$('#'+this.id).tooltip();
+	}
+});
+
 Vue.component('search-select', {
 	template:
 `<div class="form-group">
@@ -84,22 +96,36 @@ var bus = new Vue();
 Vue.component('car-best-price', {
 	template:
 `<div>
-	<legend>Critères primaires</legend>
+	<legend>Critères primaires
+		<help-tooltip :id='tooltips.primary_crit.id' :title='tooltips.primary_crit.title'></help-tooltip>
+	</legend>
 	<search-select v-model='brand.value' :title='brand.title' :elements="brand.elements"></search-select>
 	<search-select v-model='model.value' :title='model.title' :elements="model.elements[brand.value]"></search-select>
 	<search-select v-model='fuel.value' :title='fuel.title' :elements="fuel.elements"></search-select>
 	<search-text v-model='spec.value' :title='spec.title' :placeholder='spec.placeholder'></search-text>
 
-	<legend>Critères prédictifs</legend>
+	<legend>Critères prédictifs
+		<help-tooltip :id='tooltips.predict_crit.id' :title='tooltips.predict_crit.title'></help-tooltip>
+	</legend>
 	<search-mileage v-model='mileage.value' :title='mileage.title'></search-mileage>
 	<search-company-ad v-model='company_ad.value' :title='company_ad.title'></search-company-ad>
 	<search-int v-model='regdate.value' :title='regdate.title'></search-int>
 	<search-radio v-model='gearbox.value' :title='gearbox.title' :elements='gearbox.elements'></search-radio>
-	<button class="btn btn-primary" @click="predict" :disabled='searching'>Predict</button>
+	<button class="btn btn-primary" @click="predict" :disabled='searching'>Estimer</button>
 </div>
 `,
 	data: function() {
 		return {
+			tooltips: {
+				primary_crit: {
+					id: 'primary_crit',
+					title: 'Ces critères servent à filtrer des voitures existantes.'
+				},
+				predict_crit: {
+					id: 'predict_crit',
+					title: 'Ces critères servent à prédire une voiture théorique.'
+				}
+			},
 			spec: {
 				title: 'Détail',
 				placeholder: 'Modèle/motorisation (ex: 1.6 vti, 320d, 1.6 120, ...)',
@@ -219,18 +245,6 @@ Vue.component('prediction-price', {
 		rounded_price: function() {
 			return Math.round10(this.price, 2);
 		}
-	}
-});
-
-Vue.component('help-tooltip', {
-	template:
-`<span :id='id' class='glyphicon glyphicon-question-sign'
-	   data-toggle="tooltip" data-placement="right" trigger='hover'
-	   :title="text">
-</span>`,
-	props: ['id', 'text'],
-	mounted: function() {
-		$('#'+this.id).tooltip();
 	}
 });
 
