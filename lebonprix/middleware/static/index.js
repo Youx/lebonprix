@@ -240,8 +240,8 @@ Vue.component('prediction-samples', {
 	<h2>Ce genre de voiture?
 		<help-tooltip :id='tooltip.id' :text='tooltip.text'></help-tooltip>
 	</h2>
-	<div v-for='chunk in chunks' class='row' style='display: flex;'>
-		<div v-for='element in chunk' class='col-sm-3' style='display: flex;'>
+	<div class='row' style='display: flex;'>
+		<div v-for='element in elements' class='col-sm-3' style='display: flex;'>
 			<div class='thumbnail' style='width: 100%'>
 				<img :src='element.picture' :alt='element.title'></img>
 				<div class='caption'><h3>{{ element.title }}<h3></div>
@@ -258,20 +258,6 @@ Vue.component('prediction-samples', {
 		};
 	},
 	props: ['elements', 'display_on'],
-	computed: {
-	   chunks: function() {
-		   function chunk(array, chunk_size) {
-			   var i, j, temparray;
-			   var res = [];
-			   for (i = 0, j = array.length; i < j; i += chunk_size) {
-			       temparray = array.slice(i, i + chunk_size);
-				   res.push(temparray);
-			   }
-			   return res;
-		   }
-		   return chunk(this.elements, 4);
-	   }
-	}
 })
 Vue.component('prediction-frame', {
 	template:

@@ -25,7 +25,7 @@ def predict_price():
     samples = [
         {'title': result['subject'],
          'picture': result['thumb']}
-        for result in [x for x in search_results if x['thumb'] != ''][:8]
+        for result in [x for x in search_results if x['thumb'] != ''][:4]
     ]
     price = search.predict(search_results, {'gearbox': data['gearbox'], 'regdate': data['regdate'],
                                             'company_ad': data['company_ad'], 'mileage': data['mileage']})
