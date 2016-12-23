@@ -222,10 +222,24 @@ Vue.component('prediction-price', {
 	}
 });
 
+Vue.component('help-tooltip', {
+	template:
+`<span :id='id' class='glyphicon glyphicon-question-sign'
+	   data-toggle="tooltip" data-placement="right" trigger='hover'
+	   :title="text">
+</span>`,
+	props: ['id', 'text'],
+	mounted: function() {
+		$('#'+this.id).tooltip();
+	}
+});
+
 Vue.component('prediction-samples', {
 	template:
 `<div v-if='display_on'>
-	<h2>Ce genre de voiture?</h2>
+	<h2>Ce genre de voiture?
+		<help-tooltip :id='tooltip.id' :text='tooltip.text'></help-tooltip>
+	</h2>
 	<div v-for='chunk in chunks' class='row' style='display: flex;'>
 		<div v-for='element in chunk' class='col-sm-3' style='display: flex;'>
 			<div class='thumbnail' style='width: 100%'>
@@ -235,6 +249,14 @@ Vue.component('prediction-samples', {
 		</div>
 	</div>
 </div>`,
+	data: function() {
+		return {
+			tooltip: {
+				id: 'tooltip1',
+				text: 'Pas assez précis? Remplissez le champ de recherche "Détail"'
+			}
+		};
+	},
 	props: ['elements', 'display_on'],
 	computed: {
 	   chunks: function() {
