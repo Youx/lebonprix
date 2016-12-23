@@ -220,13 +220,30 @@ Vue.component('prediction-price', {
 Vue.component('prediction-samples', {
 	template:
 `<div v-if='display_on'>
-	<div v-for='element in elements'>
-		<img :src='element.picture'></img>
-		<div>{{ element.title }}</div>
+	<div v-for='chunk in chunks' class='row' style='display: flex;'>
+		<div v-for='element in chunk' class='col-sm-3' style='display: flex;'>
+			<div class='thumbnail' style='width: 100%'>
+				<img :src='element.picture' :alt='element.title'></img>
+				<div class='caption'><h3>{{ element.title }}<h3></div>
+			</div>
+		</div>
 	</div>
-</div>
-`,
-	props: ['elements', 'display_on']
+</div>`,
+	props: ['elements', 'display_on'],
+	computed: {
+	   chunks: function() {
+		   function chunk(array, chunk_size) {
+			   var i, j, temparray;
+			   var res = [];
+			   for (i = 0, j = array.length; i < j; i += chunk_size) {
+			       temparray = array.slice(i, i + chunk_size);
+				   res.push(temparray);
+			   }
+			   return res;
+		   }
+		   return chunk(this.elements, 4);
+	   }
+	}
 })
 Vue.component('prediction-frame', {
 	template:
