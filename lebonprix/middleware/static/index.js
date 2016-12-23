@@ -211,10 +211,15 @@ Vue.component('loading', {
 Vue.component('prediction-price', {
 	template:
 `<div v-if='display_on'>
-	<div>price : {{price}}</div>
-	<div>sample size : {{sample_size}}</div>
+	<h2>Ca vaut probablement dans les {{rounded_price}} €</h2>
+	<div>taille de l'échantillon : {{sample_size}}</div>
 </div>`,
-	props: ['display_on', 'price', 'sample_size']
+	props: ['display_on', 'price', 'sample_size'],
+	computed: {
+		rounded_price: function() {
+			return Math.round10(this.price, 2);
+		}
+	}
 });
 
 Vue.component('prediction-samples', {
