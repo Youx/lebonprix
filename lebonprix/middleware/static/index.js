@@ -96,22 +96,37 @@ var bus = new Vue();
 Vue.component('car-best-price', {
 	template:
 `<div>
-	<legend>Critères primaires
+	<h4>Critères primaires
 		<help-tooltip :id='tooltips.primary_crit.id' :title='tooltips.primary_crit.title'></help-tooltip>
-	</legend>
+	</h4>
 	<search-select v-model='brand.value' :title='brand.title' :elements="brand.elements"></search-select>
 	<search-select v-model='model.value' :title='model.title' :elements="model.elements[brand.value]"></search-select>
 	<search-select v-model='fuel.value' :title='fuel.title' :elements="fuel.elements"></search-select>
 	<search-text v-model='spec.value' :title='spec.title' :placeholder='spec.placeholder'></search-text>
 
-	<legend>Critères prédictifs
-		<help-tooltip :id='tooltips.predict_crit.id' :title='tooltips.predict_crit.title'></help-tooltip>
-	</legend>
-	<search-mileage v-model='mileage.value' :title='mileage.title'></search-mileage>
-	<search-company-ad v-model='company_ad.value' :title='company_ad.title'></search-company-ad>
-	<search-int v-model='regdate.value' :title='regdate.title'></search-int>
-	<search-radio v-model='gearbox.value' :title='gearbox.title' :elements='gearbox.elements'></search-radio>
-	<button class="btn btn-primary" @click="predict" :disabled='searching'>Estimer</button>
+	<div>
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation" class="active"><a href="#car-predict" aria-controls="car-predict" role="tab" data-toggle="tab">Estimation</a></li>
+			<li role="presentation"><a href="#car-bestoffers" aria-controls="car-bestoffers" role="tab" data-toggle="tab">Meilleures offres</a></li>
+		</ul>
+
+		<div class='tab-content'>
+			<div role='tabpanel' class='tab-pane active' id='car-predict'>
+				<h4>Critères prédictifs
+					<help-tooltip :id='tooltips.predict_crit.id' :title='tooltips.predict_crit.title'></help-tooltip>
+				</h4>
+				<search-mileage v-model='mileage.value' :title='mileage.title'></search-mileage>
+				<search-company-ad v-model='company_ad.value' :title='company_ad.title'></search-company-ad>
+				<search-int v-model='regdate.value' :title='regdate.title'></search-int>
+				<search-radio v-model='gearbox.value' :title='gearbox.title' :elements='gearbox.elements'></search-radio>
+				<button class="btn btn-primary" @click="predict" :disabled='searching'>Estimer</button>
+			</div>
+			<div role='tabpanel' class='tab-pane' id='car-bestoffers'>
+				<legend>Critères de choix</legend>
+				<button class="btn btn-primary" @click="predict" :disabled='searching'>Trouver</button>
+			</div>
+		</div>
+	</div>
 </div>
 `,
 	data: function() {
