@@ -156,9 +156,9 @@ class CarSearch(Search):
         for x in range(0, len(inputs)):
             inputs[x]['expected_price'] = int(predicted_prices[x])
             # compute % of how more expensive it is
-            inputs[x]['bonne_affaire_pc'] = ((float(inputs[x]['price']) / float(inputs[x]['expected_price']) - 1) * 100)
+            inputs[x]['economy_pc'] = int((float(inputs[x]['price']) / float(inputs[x]['expected_price']) - 1) * 100)
 
-        sorted_inputs = sorted(inputs, key=lambda x: x['bonne_affaire_pc'])
+        sorted_inputs = sorted(inputs, key=lambda x: x['economy_pc'])
         filtered_inputs = sorted_inputs
 
         if 'gearbox' in filters:

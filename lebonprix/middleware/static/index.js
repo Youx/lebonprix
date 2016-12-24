@@ -249,6 +249,9 @@ Vue.component('car-best-price', {
 			});
 		},
 		find_best_offers: function() {
+			var component = this;
+			component.searching = true;
+			bus.$emit('searching', true);
 			var data = {
 				brand: this.brand.value,
 				model: this.model.value,
@@ -264,7 +267,12 @@ Vue.component('car-best-price', {
 				data: JSON.stringify(data),
 				contentType: 'application/json'
 			}).done(function(val) {
-				console.log(val)
+				component.searching = false;
+				bus.$emit('searching', false);
+				bus.$emit('best-offers', {
+					results: val.results,
+					sample_size: val.sample_size,
+				});
 			});
 		}
 	}
@@ -354,6 +362,48 @@ Vue.component('prediction-frame', {
 			component.searching = val;
 			if (component.searching == true)
 				component.prediction.available = false;
+		});
+	}
+});
+
+Vue.component('best-offers-frame', {
+	template:
+`<div v-if='best_offers.available'>
+	<h2>Les meilleurs plans :</h2>
+	<div class='row' style='display: flex;'>
+		<div v-for='element in best_offers.elements' class='col-sm-3' style='display: flex;'>
+			<div class='thumbnail' style='width: 100%'>
+				<img :src='element.thumb' :alt='element.title'></img>
+				<div class='caption'>
+					<h3>{{ element.subject }}</h3>
+					<div>{{ element.price }}€ au lieu de {{element.expected_price}}€ = {{element.economy_pc}}%</div>
+					<div>{{ element.regdate}} / {{ element.mileage }}km</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>`,
+	data: function() {
+		return {
+			best_offers: {
+				elements: [],
+				sample_size: 0,
+				available: false
+			},
+			searching: false
+		};
+	},
+	created: function() {
+		var component = this;
+		bus.$on('best-offers', function(val) {
+			component.best_offers.elements = val.results;
+			component.best_offers.sample_size = val.sample_size;
+			component.best_offers.available = true
+		});
+		bus.$on('searching', function(val) {
+			component.searching = val;
+			if (component.searching == true)
+				component.best_offers.available = false;
 		});
 	}
 });
