@@ -171,5 +171,4 @@ class CarSearch(Search):
         if 'max_mileage' in filters:
             filtered_inputs = [x for x in filtered_inputs if x['mileage'] <= filters['max_mileage']]
 
-        for car in filtered_inputs[:count]:
-            self.print_car(car)
+        return filtered_inputs[:count]

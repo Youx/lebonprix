@@ -123,7 +123,10 @@ Vue.component('car-best-price', {
 			</div>
 			<div role='tabpanel' class='tab-pane' id='car-bestoffers'>
 				<legend>Critères de choix</legend>
-				<button class="btn btn-primary" @click="predict" :disabled='searching'>Trouver</button>
+				<search-int v-model='max_price.value' :title='max_price.title'></search-int>
+				<search-mileage v-model='max_mileage.value' :title='max_mileage.title'></search-mileage>
+				<search-radio v-model='gearbox.value' :title='gearbox.title' :elements='gearbox.elements'></search-radio>
+				<button class="btn btn-primary" @click="find_best_offers" :disabled='searching'>Trouver</button>
 			</div>
 		</div>
 	</div>
@@ -148,6 +151,14 @@ Vue.component('car-best-price', {
 			},
 			mileage: {
 				title: 'Kilometrage',
+				value: 0
+			},
+			max_mileage: {
+				title: 'Kilometrage max',
+				value: 0
+			},
+			max_price: {
+				title: 'Prix maximum',
 				value: 0
 			},
 			company_ad: {
@@ -236,6 +247,25 @@ Vue.component('car-best-price', {
 					samples: val.samples
 				});
 			});
+		},
+		find_best_offers: function() {
+			var data = {
+				brand: this.brand.value,
+				model: this.model.value,
+				fuel: this.fuel.value,
+				gearbox: this.gearbox.value,
+				max_mileage: this.max_mileage.value,
+				spec: this.spec.value,
+				max_price: this.max_price.value
+			};
+			$.ajax({
+				type: 'POST',
+				url: '/api/cars/best_offers',
+				data: JSON.stringify(data),
+				contentType: 'application/json'
+			}).done(function(val) {
+				console.log(val)
+			});
 		}
 	}
 });
@@ -287,7 +317,8 @@ Vue.component('prediction-samples', {
 		};
 	},
 	props: ['elements', 'display_on'],
-})
+});
+
 Vue.component('prediction-frame', {
 	template:
 `<div>

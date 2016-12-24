@@ -31,6 +31,19 @@ def predict_price():
                                             'company_ad': data['company_ad'], 'mileage': data['mileage']})
     return flask.json.jsonify({'price': int(price[0]), 'sample_size': len(search_results), 'samples': samples})
 
+@app.route("/api/cars/best_offers", methods=['POST'])
+def best_offers():
+    data = flask.request.get_json()
+    search = CarSearch(brand=data['brand'], model=data['model'], fuel=data['fuel'], detail=data['spec'])
+    search_results = list(search())
+    results = search.find_best(search_results, 4,
+                               {'gearbox': data['gearbox'],
+                                'max_price': int(data['max_price']),
+                                'max_mileage': int(data['max_mileage'])})
+    return flask.json.jsonify({'results': results, 'sample_size': len(search_results)})
+
+
+
 
 if __name__ == '__main__':
     app.run()
