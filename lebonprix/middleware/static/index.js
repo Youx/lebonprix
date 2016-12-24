@@ -122,7 +122,7 @@ Vue.component('car-best-price', {
 				<button class="btn btn-primary" @click="predict" :disabled='searching'>Estimer</button>
 			</div>
 			<div role='tabpanel' class='tab-pane' id='car-bestoffers'>
-				<legend>Critères de choix</legend>
+				<h4>Critères de choix</h4>
 				<search-int v-model='max_price.value' :title='max_price.title'></search-int>
 				<search-mileage v-model='max_mileage.value' :title='max_mileage.title'></search-mileage>
 				<search-radio v-model='gearbox.value' :title='gearbox.title' :elements='gearbox.elements'></search-radio>
