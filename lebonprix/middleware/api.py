@@ -36,7 +36,7 @@ def best_offers():
     data = flask.request.get_json()
     search = CarSearch(brand=data['brand'], model=data['model'], fuel=data['fuel'], detail=data['spec'])
     search_results = list(search())
-    results = search.find_best(search_results, 4,
+    results = search.find_best(search_results, 8,
                                {'gearbox': data['gearbox'],
                                 'max_price': int(data['max_price']),
                                 'max_mileage': int(data['max_mileage'])})

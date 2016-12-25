@@ -366,20 +366,36 @@ Vue.component('prediction-frame', {
 	}
 });
 
+Vue.component('best-offer', {
+	template:
+`<div class='thumbnail' style='width: 100%' :href='url'>
+	<img :src='thumb' :alt='subject'></img>
+	<div class='caption' style='display: flex; flex-direction: column'>
+		<h4>{{ subject }}</h4>
+		<div>{{ price }}€ au lieu de {{expected_price}}€ = {{economy_pc}}%</div>
+		<div>{{ regdate}} / {{ mileage }}km</div>
+	</div>
+	<div><a class='btn btn-primary' :href='url'>Annonce</a></div>
+</div>`,
+	props: ['id', 'thumb', 'subject', 'price', 'expected_price', 'mileage', 'regdate', 'economy_pc'],
+	computed: {
+		url: function() {
+			return 'http://www.leboncoin.fr/voitures/'+this.id+'.htm';
+		}
+	}
+});
+
 Vue.component('best-offers-frame', {
 	template:
 `<div v-if='best_offers.available'>
 	<h2>Les meilleurs plans :</h2>
-	<div class='row' style='display: flex;'>
-		<div v-for='element in best_offers.elements' class='col-sm-3' style='display: flex;'>
-			<div class='thumbnail' style='width: 100%'>
-				<img :src='element.thumb' :alt='element.title'></img>
-				<div class='caption'>
-					<h3>{{ element.subject }}</h3>
-					<div>{{ element.price }}€ au lieu de {{element.expected_price}}€ = {{element.economy_pc}}%</div>
-					<div>{{ element.regdate}} / {{ element.mileage }}km</div>
-				</div>
-			</div>
+	<div v-for='chunk in elements_chunks' class='row' style='display: flex;'>
+		<div v-for='element in chunk' class='col-sm-3' style='display: flex;'>
+			<best-offer :thumb='element.thumb' :subject='element.subject'
+						:price='element.price' :expected_price='element.expected_price'
+						:mileage='element.mileage' :regdate='element.regdate'
+						:economy_pc='element.economy_pc' :id='element.id'>
+			</best-offer>
 		</div>
 	</div>
 </div>`,
@@ -398,13 +414,27 @@ Vue.component('best-offers-frame', {
 		bus.$on('best-offers', function(val) {
 			component.best_offers.elements = val.results;
 			component.best_offers.sample_size = val.sample_size;
-			component.best_offers.available = true
+			component.best_offers.available = true;
 		});
 		bus.$on('searching', function(val) {
 			component.searching = val;
 			if (component.searching == true)
 				component.best_offers.available = false;
 		});
+	},
+	computed: {
+		elements_chunks: function() {
+			function chunk(array, chunk_size) {
+				var i, j, temparray;
+				var res = [];
+				for (i = 0, j = array.length; i < j; i += chunk_size) {
+					temparray = array.slice(i, i + chunk_size);
+					res.push(temparray);
+				}
+				return res;
+			}
+			return chunk(this.best_offers.elements, 4);
+		}
 	}
 });
 
