@@ -4,7 +4,6 @@ from lebonprix.cache import Cache
 
 class TestCache(unittest.TestCase):
     def setUp(self):
-        self.subject = Cache()
         self.item = {
             'list_id': 1234,
             'other_data': {
