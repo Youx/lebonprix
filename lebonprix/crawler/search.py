@@ -37,21 +37,22 @@ class Item(LBC):
             for key in self.additional_info:
                 if key not in cached_item:
                     need_to_update = True
-                    cached_item[key] = self.additional_info[key]
+                    #cached_item[key] = self.additional_info[key]
             if need_to_update:
-                self.cache.set(cached_item)
+                self.cache.set({**cached_item, **self.additional_info})
+                return {**cached_item, **self.additional_info}
             return cached_item
 
-        new_data = self.DATA.copy()
-        new_data['ad_id'] = self.id
         r = self.session.post(
             url = self.BASE_URI + self.PAGE,
             params = {'ad_id': self.id},
-            data = new_data,
+            data = {**self.DATA, **{'ad_id': self.id}}, # copy data
             headers = self.HEADERS
         )
-        item = json.loads(r.text)
-        item.update(self.additional_info)
+        item = {
+            **json.loads(r.text),
+            **self.additional_info
+        }
         self.cache.set(item)
         return item
 
