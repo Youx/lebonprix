@@ -1,16 +1,18 @@
-from lebonprix.crawler.car_search import CarParamModel, CarParamFuel, CarSearch
+from lebonprix.crawler.car_search import CarBrandModel, CarParamFuel, CarSearch
 import flask
 
 app = flask.Flask(__name__)
-
+car_brand_model = CarBrandModel()
 
 @app.route("/api/cars/params/brand_model")
 def list_brands_and_models():
-    return flask.json.jsonify(CarParamModel.MODELS)
+    return flask.json.jsonify(car_brand_model.models)
+
 
 @app.route("/api/cars/params/fuel")
 def list_fuels():
     return flask.json.jsonify(sorted(CarParamFuel.VALUES, key=CarParamFuel.VALUES.get))
+
 
 @app.route("/api/cars/params/gearbox")
 def list_gearbox():
@@ -31,6 +33,7 @@ def predict_price():
                                             'company_ad': data['company_ad'], 'mileage': data['mileage']})
     return flask.json.jsonify({'price': int(price[0]), 'sample_size': len(search_results), 'samples': samples})
 
+
 @app.route("/api/cars/best_offers", methods=['POST'])
 def best_offers():
     data = flask.request.get_json()
@@ -41,8 +44,6 @@ def best_offers():
                                 'max_price': int(data['max_price']),
                                 'max_mileage': int(data['max_mileage'])})
     return flask.json.jsonify({'results': results, 'sample_size': len(search_results)})
-
-
 
 
 if __name__ == '__main__':
